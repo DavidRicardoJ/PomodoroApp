@@ -1,0 +1,169 @@
+﻿@page "/"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Pomodoro</title>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="nav-logo">
+                <img src="img/pngwing.com.png" alt="logo pomodoro">
+
+            </div>
+            <div class="nav-logo-name">
+                <h1>POMODORO APP</h1>
+            </div>
+        </header>
+        <nav class="menu">
+            <ul class="nav-links">
+                <li> <a href="/">Home</a></li>
+                <li> <a href="settings">Settings</a></li>
+            </ul>
+        </nav>
+        <div class="pomodoro-control">
+            <button   @onclick="SetToPomodoro">Pomodoro</button>
+            <button   @onclick="SetToShortBreak">Short Break</button>
+            <button   @onclick="SetToLongBreak">Long Break</button>
+        </div>
+        <main>
+            <strong>@timeLeft.ToString("mm:ss")</strong>
+
+        </main>
+        <div class="pomodoro-start-reset">
+            @if (pomodoroSettings == null)
+            {
+                <span class="custom-message">First all, configure the time for Pomodoro, Short Break and Long Break on Settings. </span>
+            }
+            else
+            {
+                <button  value="Reset" @onclick="ResetTimer">Reset</button>
+                <button  @onclick="SetTimer">@(timerHasStarted? "Stop":"Start")</button>
+            }
+
+        </div>
+        <footer>
+            <div class="footer-logo">
+                <img src="img/sys.png" alt="logo sistema">
+            </div>
+
+            <div class="footer-text">
+                <p>David Softwares</p>
+            </div>
+
+        </footer>
+    </div>
+</body>
+
+</html>
+
+@code {
+    private PomodoroSettings pomodoroSettings;
+    private bool timerHasStarted;
+    private static System.Timers.Timer timer;
+    private DateTime timeLeft = new DateTime();
+    private TimerType timerType;
+
+
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var json = await localStorage.GetItemAsync<string>("pomodoroSettings");
+        if (json != null) pomodoroSettings = System.Text.Json.JsonSerializer.Deserialize<PomodoroSettings>(json); StateHasChanged();
+        timerType = TimerType.Pomodoro;
+        SetToPomodoro();
+    }
+
+    private void SetToPomodoro()
+    {
+        timerHasStarted = false;
+        timeLeft = new DateTime();
+        timerType = TimerType.Pomodoro;
+        timeLeft = timeLeft.AddMinutes(pomodoroSettings.PomodoroDuration);
+        StateHasChanged();
+    }
+
+    private void SetToShortBreak()
+    {
+        timerHasStarted = false;
+        timeLeft = new DateTime();
+        timerType = TimerType.ShortBreak;
+        timeLeft = timeLeft.AddMinutes(pomodoroSettings.ShortBreak);
+        StateHasChanged();
+    }
+
+    private void SetToLongBreak()
+    {
+        timerHasStarted = false;
+        timeLeft = new DateTime();
+        timerType = TimerType.LongBreak;
+        timeLeft = timeLeft.AddMinutes(pomodoroSettings.LongBreak);
+        StateHasChanged();
+    }
+
+    private void ResetTimer()
+    {
+        timerHasStarted = false;
+        
+        switch (timerType)
+        {
+            case TimerType.Pomodoro:
+                SetToPomodoro();
+                break;
+            case TimerType.ShortBreak:
+                SetToShortBreak();
+                break;
+            case TimerType.LongBreak:
+                SetToLongBreak();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void SetTimer()
+    {
+        if (timerHasStarted)
+        {
+            timerHasStarted = false;
+        }
+        else
+        {
+            if (timer != null)
+            {
+                timer.Dispose();
+            }
+            timerHasStarted = true;
+            timer = new System.Timers.Timer(1000);
+            timer.Elapsed += OnTimeEvent;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+        }
+        StateHasChanged();
+    }
+
+    private void OnTimeEvent(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        if (timerHasStarted)
+        {
+            try
+            {
+                timeLeft = timeLeft.AddSeconds(-1);
+                StateHasChanged();
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+    }
+}

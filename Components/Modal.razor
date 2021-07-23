@@ -1,0 +1,32 @@
+﻿
+
+<link href="/css/modal.css" rel="stylesheet" />
+
+<div class="@modalContainer">
+    <div class="modal">
+        <button class="@fecharModal" @onclick="Fechar">x</button>
+        <h1 class="subtitulo">@Title</h1>
+        <form>
+            <input type="button" class="button" value="Ok!" @onclick="Fechar">
+        </form>
+    </div>
+</div>
+<audio src="/Sound/Musical-Beep-Loop-02.wav" autoplay></audio>
+
+
+@code {
+    private string fecharModal = "fechar";
+    private string modalContainer = "modal-container mostrar";
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public EventCallback EventCallBack { get; set; }
+
+    private async void Fechar()
+    {
+        modalContainer = "modal-container";
+        await EventCallBack.InvokeAsync();
+    }
+}

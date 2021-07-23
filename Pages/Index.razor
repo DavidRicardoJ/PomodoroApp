@@ -30,12 +30,19 @@
             </ul>
         </nav>
         <div class="pomodoro-control">
-            <button   @onclick="SetToPomodoro">Pomodoro</button>
-            <button   @onclick="SetToShortBreak">Short Break</button>
-            <button   @onclick="SetToLongBreak">Long Break</button>
+            <button @onclick="SetToPomodoro">Pomodoro</button>
+            <button @onclick="SetToShortBreak">Short Break</button>
+            <button @onclick="SetToLongBreak">Long Break</button>
         </div>
         <main>
             <strong>@timeLeft.ToString("mm:ss")</strong>
+
+            @if (modalShow || true)
+            {
+                <Modal EventCallBack="StartNewCicle" Title="@title"></Modal>
+                modalShow = false;
+            }
+
 
         </main>
         <div class="pomodoro-start-reset">
@@ -45,9 +52,9 @@
             }
             else
             {
-                <button  value="Reset" @onclick="ResetTimer">Reset</button>
-                <button  @onclick="SetTimer">@(timerHasStarted? "Stop":"Start")</button>
-            }
+                <button value="Reset" @onclick="ResetTimer">Reset</button>
+                <button @onclick="SetTimer">@(timerHasStarted? "Stop":"Start")</button>
+            }           
 
         </div>
         <footer>
@@ -71,10 +78,16 @@
     private static System.Timers.Timer timer;
     private DateTime timeLeft = new DateTime();
     private TimerType timerType;
+    private bool modalShow = false;
+    private int ciclePomodoro = 0;
+    private string title;
 
+    private void StartNewCicle()
+    {
+        ++ciclePomodoro;
+        PomodoroControl();
+    }
 
-
-    
     protected override async Task OnInitializedAsync()
     {
         var json = await localStorage.GetItemAsync<string>("pomodoroSettings");
@@ -113,7 +126,7 @@
     private void ResetTimer()
     {
         timerHasStarted = false;
-        
+
         switch (timerType)
         {
             case TimerType.Pomodoro:
@@ -159,6 +172,12 @@
             {
                 timeLeft = timeLeft.AddSeconds(-1);
                 StateHasChanged();
+                if (timeLeft.Minute == 0 && timeLeft.Second == 0)
+                {
+                    timer.Enabled = false;
+                    modalShow = true;
+                    StateHasChanged();
+                }
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -166,4 +185,43 @@
             }
         }
     }
+
+    private void PomodoroControl()
+    {
+        if (ciclePomodoro == 1 || ciclePomodoro == 3)
+        {
+            title = "Let's go back to work!";
+            StartShortBreak();
+        }
+        if (ciclePomodoro == 2 || ciclePomodoro == 4 || ciclePomodoro == 5)
+        {
+            StartPomodoro();
+            title = "It's time to rest!"; 
+        }
+        if (ciclePomodoro == 6)
+        {
+            StartLongBreak();
+            title = "Let's go back to work!";
+            ciclePomodoro = 0;
+        }
+    }
+
+    private void StartPomodoro()
+    {
+        SetToPomodoro();
+        SetTimer();
+    }
+
+    private void StartShortBreak()
+    {
+        SetToShortBreak();
+        SetTimer();
+    }
+    private void StartLongBreak()
+    {
+        SetToLongBreak();
+        SetTimer();
+    }
+
+
 }

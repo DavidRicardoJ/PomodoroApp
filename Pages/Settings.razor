@@ -15,22 +15,10 @@
 
 <body>
     <div class="container">
-        <header>
-            <div class="nav-logo">
-                <img src="img/pngwing.com.png" alt="logo pomodoro">
 
-            </div>
-            <div class="nav-logo-name">
-                <h1>POMODORO APP</h1>
-            </div>
-        </header>
-        <nav class="menu">
-            <ul class="nav-links">
-                <li> <a href="/">Home</a></li>
-                <li> <a href="#">Settings</a></li>
-            </ul>
-        </nav>
-        <!-- ////// -->
+        <Header />
+        <NavMenu />
+        
         <main>
             <EditForm Model="@pomodoroSettings" OnValidSubmit="FormSubmit" class="form">
                 <div class="range-wrap">
@@ -58,16 +46,8 @@
 
         </main>
 
-        <footer>
-            <div class="footer-logo">
-                <img src="img/sys.png" alt="logo sistema">
-            </div>
+       <Footer/>
 
-            <div class="footer-text">
-                <p>David Softwares</p>
-            </div>
-
-        </footer>
     </div>
 
 </body>

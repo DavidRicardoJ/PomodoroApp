@@ -1,4 +1,5 @@
 ﻿@page "/"
+@page "/index"
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <!DOCTYPE html>
@@ -13,22 +14,10 @@
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <div class="nav-logo">
-                <img src="img/pngwing.com.png" alt="logo pomodoro">
-
-            </div>
-            <div class="nav-logo-name">
-                <h1>POMODORO APP</h1>
-            </div>
-        </header>
-        <nav class="menu">
-            <ul class="nav-links">
-                <li> <a href="/">Home</a></li>
-                <li> <a href="settings">Settings</a></li>
-            </ul>
-        </nav>
+    <div class="container">       
+        <Header/>
+        <NavMenu/>
+        
         <div class="pomodoro-control">
             <button @onclick="SetToPomodoro">Pomodoro</button>
             <button @onclick="SetToShortBreak">Short Break</button>
@@ -37,7 +26,7 @@
         <main>
             <strong>@timeLeft.ToString("mm:ss")</strong>
 
-            @if (modalShow || true)
+            @if (modalShow)
             {
                 <Modal EventCallBack="StartNewCicle" Title="@title"></Modal>
                 modalShow = false;
@@ -57,16 +46,9 @@
             }           
 
         </div>
-        <footer>
-            <div class="footer-logo">
-                <img src="img/sys.png" alt="logo sistema">
-            </div>
+        
+        <Footer/>
 
-            <div class="footer-text">
-                <p>David Softwares</p>
-            </div>
-
-        </footer>
     </div>
 </body>
 

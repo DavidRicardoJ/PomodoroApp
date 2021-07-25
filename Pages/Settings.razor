@@ -62,7 +62,7 @@
     {
         var json = System.Text.Json.JsonSerializer.Serialize(pomodoroSettings);
         await localStorage.SetItemAsync("pomodoroSettings", json);
-        navigationManager.NavigateTo("/");
+        navigationManager.NavigateTo("index");
     }
 
 

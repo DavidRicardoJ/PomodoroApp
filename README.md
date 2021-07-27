@@ -1,4 +1,4 @@
 # PomodoroApp
 pomodoro app with blazor web assembly
 
-https://davidricardoj.github.io/PomodoroBlazor/
+https://davidricardoj.github.io/pomodoro/
